@@ -1,0 +1,83 @@
+[project]
+name = "django-md-docs"
+version = "0.1.0"
+description = "A reusable Django app that serves a markdown folder as a documentation site at /docs"
+readme = "README.md"
+authors = [
+    { name = "Gabriel Chaves", email = "gabriel.chaves@olist.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "django>=5.0",
+    "markdown>=3.5",
+]
+
+[dependency-groups]
+dev = [
+    "django-stubs>=5.2.9",
+    "mypy>=1.19.1",
+    "pre-commit>=4.0.0",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "pytest-django>=4.12.0",
+    "types-markdown>=3.10.2.20260211",
+]
+
+[build-system]
+requires = ["uv_build>=0.10.2,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "md_docs"
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+strict = true
+
+[tool.django-stubs]
+django_settings_module = "django.conf.global_settings"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+asyncio_mode = "auto"
+pythonpath = [".", "test-app"]
+addopts = "--cov --cov-report=term-missing"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  # annotations — mypy strict mode already covers this
+  "ANN",
+  # docstrings — not enforced in this project
+  "D100", "D107",
+  # pydoclint — redundant with mypy
+  "DOC",
+  # pandas / numpy / airflow / fastapi — not used
+  "PD", "NPY", "AIR", "FAST",
+  # conflicts with ruff formatter
+  "COM812", "ISC001"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+  "S101",    # assert allowed in tests
+  "ARG",     # unused arguments (fixtures)
+  "SLF001",  # private member access in tests
+  "PLR2004", # magic values in tests
+]
+"test-app/**" = ["INP001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["md_docs"]
+
+[tool.ruff.lint.pylint]
+max-args = 8
+
+[tool.coverage.run]
+source = ["src/md_docs", "test-app"]
+omit = ["tests/*", "test-app/manage.py", "test-app/test_app/settings.py"]
