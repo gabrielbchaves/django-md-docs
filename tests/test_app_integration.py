@@ -135,7 +135,9 @@ def test_toc_links_have_anchors(auth_test_app_client: Client) -> None:
     assert b'href="#installation"' in response.content
 
 
-def test_section_index_without_trailing_slash_redirects(auth_test_app_client: Client) -> None:
+def test_section_index_without_trailing_slash_redirects(
+    auth_test_app_client: Client,
+) -> None:
     """Visiting a section index without a trailing slash redirects permanently to the slash URL."""
     response = auth_test_app_client.get("/docs/api")
 

@@ -22,9 +22,8 @@ def test_get_content_dir_falls_back_to_base_dir(tmp_path: Path) -> None:
 
 def test_get_content_dir_raises_without_base_dir() -> None:
     """Raises ImproperlyConfigured when neither MD_DOCS_DIR nor BASE_DIR is set."""
-    with override_settings(MD_DOCS_DIR=None, BASE_DIR=None):
-        with pytest.raises(ImproperlyConfigured):
-            _get_content_dir()
+    with override_settings(MD_DOCS_DIR=None, BASE_DIR=None), pytest.raises(ImproperlyConfigured):
+        _get_content_dir()
 
 
 def test_resolve_md_file_index(md_docs_dir: Path) -> None:

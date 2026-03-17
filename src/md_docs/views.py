@@ -20,7 +20,8 @@ def _get_content_dir() -> Path:
     if path is None:
         base_dir = getattr(settings, "BASE_DIR", None)
         if base_dir is None:
-            raise ImproperlyConfigured("Set MD_DOCS_DIR or BASE_DIR in settings.")
+            msg = "Set MD_DOCS_DIR or BASE_DIR in settings."
+            raise ImproperlyConfigured(msg)
         path = Path(base_dir) / "md-docs"
     return Path(path).resolve()
 
@@ -70,15 +71,9 @@ def _build_nav(content_dir: Path) -> list[dict[str, Any]]:
             continue
 
         slug = "/".join(parts[:-1]) if is_index else "/".join(parts).removesuffix(".md")
-        url = (
-            reverse("md_docs:docs-page", args=[slug])
-            if slug
-            else reverse("md_docs:docs-index")
-        )
+        url = reverse("md_docs:docs-page", args=[slug]) if slug else reverse("md_docs:docs-index")
 
-        first_line = next(
-            (line for line in path.read_text().splitlines() if line.strip()), ""
-        )
+        first_line = next((line for line in path.read_text().splitlines() if line.strip()), "")
         title = first_line.lstrip("#").strip() or path.stem
 
         depth = max(0, len(parts) - 2) if is_index else len(parts) - 1
@@ -104,10 +99,7 @@ async def docs_page(request: HttpRequest, page: str = "") -> HttpResponse:
     MD_DOCS_LOGOUT_URL    URL for the logout action. When None the logout button
                           is hidden (default None).
     """
-    if (
-        getattr(settings, "MD_DOCS_LOGIN_REQUIRED", True)
-        and not (await request.auser()).is_authenticated
-    ):
+    if getattr(settings, "MD_DOCS_LOGIN_REQUIRED", True) and not (await request.auser()).is_authenticated:
         return redirect_to_login(request.get_full_path())
 
     content_dir = _get_content_dir()
@@ -116,9 +108,7 @@ async def docs_page(request: HttpRequest, page: str = "") -> HttpResponse:
         raise Http404
 
     if md_file.name == "index.md" and page and not page.endswith("/"):
-        return HttpResponsePermanentRedirect(
-            reverse("md_docs:docs-page", args=[page + "/"])
-        )
+        return HttpResponsePermanentRedirect(reverse("md_docs:docs-page", args=[page + "/"]))
 
     md = markdown.Markdown(
         extensions=["tables", "fenced_code", "toc", "attr_list"],
@@ -127,11 +117,7 @@ async def docs_page(request: HttpRequest, page: str = "") -> HttpResponse:
     body = md.convert(md_file.read_text())
 
     slug = page.strip("/")
-    current_url = (
-        reverse("md_docs:docs-page", args=[slug])
-        if slug
-        else reverse("md_docs:docs-index")
-    )
+    current_url = reverse("md_docs:docs-page", args=[slug]) if slug else reverse("md_docs:docs-index")
 
     return render(
         request,

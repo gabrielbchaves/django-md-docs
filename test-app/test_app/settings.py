@@ -2,7 +2,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-secret-key-not-for-production"
+SECRET_KEY = "dev-secret-key-not-for-production"  # noqa: S105
 
 DEBUG = True
 

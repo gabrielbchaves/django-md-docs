@@ -2,7 +2,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-SECRET_KEY = "test-secret-key"
+SECRET_KEY = "test-secret-key"  # noqa: S105
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",

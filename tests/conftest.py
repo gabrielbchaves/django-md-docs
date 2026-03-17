@@ -6,18 +6,19 @@ from django.test import Client, override_settings
 
 TEST_APP_DOCS = Path(__file__).resolve().parent.parent / "test-app" / "md-docs"
 
-TEST_APP_SETTINGS = dict(
-    MD_DOCS_DIR=TEST_APP_DOCS,
-    MD_DOCS_LOGIN_REQUIRED=True,
-    MD_DOCS_BRAND="My Project Docs",
-    MD_DOCS_LOGOUT_URL="/accounts/logout/",
-    ROOT_URLCONF="test_app.urls",
-    LOGIN_URL="/accounts/login/",
-)
+TEST_APP_SETTINGS = {
+    "MD_DOCS_DIR": TEST_APP_DOCS,
+    "MD_DOCS_LOGIN_REQUIRED": True,
+    "MD_DOCS_BRAND": "My Project Docs",
+    "MD_DOCS_LOGOUT_URL": "/accounts/logout/",
+    "ROOT_URLCONF": "test_app.urls",
+    "LOGIN_URL": "/accounts/login/",
+}
 
 
-@pytest.fixture()
+@pytest.fixture
 def md_docs_dir(tmp_path: Path) -> Path:
+    """Temporary md-docs directory with sample pages."""
     docs = tmp_path / "md-docs"
     docs.mkdir()
 
@@ -32,13 +33,15 @@ def md_docs_dir(tmp_path: Path) -> Path:
     return docs
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_app_client(client: Client) -> Generator[Client, None, None]:
+    """Unauthenticated client with test-app settings."""
     with override_settings(**TEST_APP_SETTINGS):
         yield client
 
 
-@pytest.fixture()
+@pytest.fixture
 def auth_test_app_client(admin_client: Client) -> Generator[Client, None, None]:
+    """Provide an authenticated admin client with test-app settings."""
     with override_settings(**TEST_APP_SETTINGS):
         yield admin_client
